@@ -19,7 +19,7 @@ This fork contains multi level categories. Demo: https://aliarshad9691.github.io
  
  `npm install ngx-material-daterangepicker --save` .
 
- import **ngxMdDaterangepicker** in your module:
+ import **NgxMdDaterangepicker** in your module:
 
 ````typescript
 ...
@@ -28,7 +28,7 @@ import { ngxMdDaterangepicker } from 'ngx-material-daterangepicker';
 import { App } from './app';
 
 @NgModule({
-    imports:      [... , FormsModule, ngxMdDaterangepicker],
+    imports:      [... , FormsModule, NgxMdDaterangepicker],
     declarations: [App],
     bootstrap:    [App]
 })
