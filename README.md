@@ -24,7 +24,7 @@ This fork contains multi level categories. Demo: https://aliarshad9691.github.io
 ````typescript
 ...
 import { FormsModule } from '@angular/forms';
-import { ngxMdDaterangepicker } from 'ngx-material-daterangepicker';
+import { NgxMdDaterangepicker } from 'ngx-material-daterangepicker';
 import { App } from './app';
 
 @NgModule({
