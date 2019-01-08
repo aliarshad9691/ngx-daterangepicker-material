@@ -1,36 +1,34 @@
-# ngx-daterangepicker-material
+# ngx-material-daterangepicker
 > Pure Angular 2+ Date range picker.
 
-[![Build Status](https://travis-ci.org/fetrarij/ngx-daterangepicker-material.svg?branch=master)](https://travis-ci.org/fetrarij/ngx-daterangepicker-material)
-[![npm version](https://badge.fury.io/js/ngx-daterangepicker-material.svg)](https://badge.fury.io/js/ngx-daterangepicker-material)
-
- This plugin is compatible with Angular2, Angular4, Angular5 and Angular6. This plugin uses moment.js.
+This plugin is compatible with Angular2, Angular4, Angular5 and Angular6. This plugin uses moment.js.
 
 This plugin is a rewrite to angular from [bootstrap daterangepicker](http://www.daterangepicker.com), so it doesn't depends on jquery nor bootstrap.
 
 This plugin have an independant theme which looks more close to material design, so the material design is just a style.
 
-
 ![](screen.png)
 
-demo:  https://fetrarij.github.io/ngx-daterangepicker-material/
+Credits: This is a fork of: https://github.com/fetrarij/ngx-daterangepicker-material
+
+This fork contains multi level categories. Demo: https://aliarshad9691.github.io/ngx-material-daterangepicker/ 
 
 ## Installation
 
  Install the plugin from npm:
  
- `npm install ngx-daterangepicker-material --save` .
+ `npm install ngx-material-daterangepicker --save` .
 
- import **NgxDaterangepickerMd** in your module:
+ import **ngxMdDaterangepicker** in your module:
 
 ````typescript
 ...
 import { FormsModule } from '@angular/forms';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { ngxMdDaterangepicker } from 'ngx-material-daterangepicker';
 import { App } from './app';
 
 @NgModule({
-    imports:      [... , FormsModule, NgxDaterangepickerMd],
+    imports:      [... , FormsModule, ngxMdDaterangepicker],
     declarations: [App],
     bootstrap:    [App]
 })
@@ -42,7 +40,7 @@ export class AppModule {}
 Html:
 
 ```html
-<input type="text" ngxDaterangepickerMd [(ngModel)]="selected" class="form-control"/>
+<input type="text" ngxMdDaterangepicker [(ngModel)]="selected" class="form-control"/>
 ```
 Typescript: 
 
@@ -54,7 +52,7 @@ Html:
 
 ```html
 <input type="text" matInput
-    ngxDaterangepickerMd
+    ngxMdDaterangepicker
     [locale]="{applyLabel: 'ok', format: 'DD-MM-YYYY'}"
     startKey="start"
     endKey="end"
@@ -66,7 +64,7 @@ Typescript:
 ````typescript
 selected: {start: Moment, end: Moment};
 ````
-You can [play with our online demo here](https://fetrarij.github.io/ngx-daterangepicker-material/)
+You can [play with our online demo here](https://aliarshad9691.github.io/ngx-material-daterangepicker/)
 and [browse our demo code here](./demo/src/app).
 
 ## Inline usage
@@ -74,8 +72,8 @@ and [browse our demo code here](./demo/src/app).
 You can use the component directly in your templates, which will set its `inline` mode to **true**, in which case the calendar won't hide after date/range selection. You can then use the events: `rangeClicked` or `datesUpdated` or `choosedDate` to get its selection state.
 
 ```html
-<ngx-daterangepicker-material (choosedDate)="choosedDate($event)">
-</ngx-daterangepicker-material>
+<ngx-material-daterangepicker (choosedDate)="choosedDate($event)">
+</ngx-material-daterangepicker>
 ```
 
 
@@ -116,7 +114,7 @@ Specifiyng `startKey` and `endKey` would have different model:
 
 example: 
 ```html
-<input type="text" ngxDaterangepickerMd startKey="start" endKey="end" [(ngModel)]="model">
+<input type="text" ngxMdDaterangepicker startKey="start" endKey="end" [(ngModel)]="model">
 ```
 
 the model we got would be:  `{start: Date, end: Date}`
@@ -125,7 +123,7 @@ the model we got would be:  `{start: Date, end: Date}`
 
 (object) Set predefined date ranges the user can select from. Each key is the label for the range, and its value an array with two dates representing the bounds of the range. As an example:
 ```html
-<input type="text" ngxDaterangepickerMd startKey="start" endKey="end" [ranges]="ranges" [(ngModel)]="model">
+<input type="text" ngxMdDaterangepicker startKey="start" endKey="end" [ranges]="ranges" [(ngModel)]="model">
 ```
 ```javascript
 ranges: any = {
@@ -187,10 +185,6 @@ You can use theses options:
 
  >Fires when the date model is updated, like applying (if you have activated the apply button), or when selecting a range or date without the apply button, and sends an object containing start and end dates, eg: `{startDate: Moment, endDate: Moment}`
 
-## Donation
 
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=THF6M338KQ626)
-
-
-## [License](https://github.com/fetrarij/ngx-daterangepicker-material/blob/master/LICENSE)
+## [License](https://github.com/aliarshad9691/ngx-material-daterangepicker/blob/master/LICENSE)
 MIT

@@ -13,21 +13,23 @@ export class CustomRangesComponent implements OnInit {
   keepCalendarOpeningWithRange: boolean;
   maxDate: moment.Moment;
   minDate: moment.Moment;
-  invalidDates: moment.Moment[] = [moment().add(2, 'days'), moment().add(3, 'days'), moment().add(5, 'days')];  
+  invalidDates: moment.Moment[] = [moment().add(2, 'days'), moment().add(3, 'days'), moment().add(5, 'days')];
   ranges: any = {
-    Today: [moment(), moment()],
-    Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-    'This Month': [moment().startOf('month'), moment().endOf('month')],
-    'Last Month': [
-      moment()
-        .subtract(1, 'month')
-        .startOf('month'),
-      moment()
-        .subtract(1, 'month')
-        .endOf('month')
-    ]
+    Last: {
+        Day: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        Week: [moment().subtract(1, 'weeks').startOf('isoWeek'), moment().subtract(1, 'weeks').endOf('isoWeek')],
+        Fortnite: [moment().subtract(2, 'weeks').startOf('isoWeek'), moment().subtract(1, 'weeks').endOf('isoWeek')],
+    },
+    Current: {
+        Day: [moment(), moment()],
+        Week: [moment().startOf('isoWeek'), moment().endOf('isoWeek')],
+        Fortnite: [moment().subtract(1, 'weeks').startOf('isoWeek'), moment().endOf('isoWeek')],
+    },
+    Next: {
+        Day: [moment().add(1, 'days'), moment().add(1, 'days')],
+        Week: [moment().add(1, 'weeks').startOf('isoWeek'), moment().add(1, 'weeks').endOf('isoWeek')],
+        Fortnite: [moment().add(1, 'weeks').startOf('isoWeek'), moment().add(2, 'weeks').endOf('isoWeek')],
+    }
   };
 
   isInvalidDate = (m: moment.Moment) =>  {

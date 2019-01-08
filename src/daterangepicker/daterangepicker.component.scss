@@ -69,7 +69,6 @@ $input-height: 3rem !default;
   font-family: Roboto, sans-serif;
   color: $md-drppicker-color;
   background-color: $md-drppicker-bg-color;
-  border-radius: 4px;
   width: $md-drppicker-width;
   padding: 4px;
   margin-top: -10px;
@@ -78,6 +77,8 @@ $input-height: 3rem !default;
   font-size: 14px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  padding-left: 15px;
+  padding-right: 15px;
   &.double {
     width: $md-drppicker-width-double;
   }
@@ -118,6 +119,38 @@ $input-height: 3rem !default;
     .ranges, .calendar {
       float: none;
     }
+  }
+  .inline-flex
+  {
+    display: inline-flex;
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 15px !important;
+  }
+  .dayInput
+  {
+    width: 15% !important;
+    background-color: #f6f6f6 !important;
+    border: 1px solid #eaeaea !important;
+    padding-left: 15px !important;
+    padding-top: 0px !important;
+    height: 30px !important;
+    border-radius: 3px !important;
+    margin-left: 13px !important;
+    margin-right: 10px !important;
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+  }
+  .paddingHolder
+  {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .liActive
+  {
+    color: #4131a1;
+    border-bottom: 1px solid #4131a1;
   }
 
   &.shown {
@@ -203,10 +236,25 @@ $input-height: 3rem !default;
       min-width: 32px;
       span {
         pointer-events: none;
+        font-weight: normal;
       }
     }
   }
-
+.d-flex
+{
+  display: flex;
+  justify-content: space-between;
+}
+  .clear
+  {
+    clear: both;
+  }
+  .border
+  {
+    border-top: 1px solid #eaeaea;
+    padding-top: 15px;
+    padding-bottom: 9px;
+  }
   .calendar-table {
     border: $md-drppicker-calendar-border-size solid $md-drppicker-calendar-border-color;
     padding: $md-drppicker-calendar-margin;
@@ -269,9 +317,8 @@ $input-height: 3rem !default;
         background-size: .5em;
         background-position: center;
         margin: .25em 0;
-        opacity: .8;
         /*transition: background-color .2s ease;*/
-        border-radius: 2em;
+        border-radius: 4px;
 
         transform: scale(1);
         transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
@@ -287,7 +334,6 @@ $input-height: 3rem !default;
 
   td {
         margin: .25em 0;
-        opacity: .8;
         transition: background-color .2s ease;
         border-radius: 2em;
         transform: scale(1);
@@ -309,14 +355,15 @@ $input-height: 3rem !default;
 
       // TODO: Should this be static or should it be parameterized?
       border-radius: 0;
+      border: 0;
     }
 
     &.start-date {
-      border-radius: 2em 0 0 2em;
+      border-radius: 4px;
     }
 
     &.end-date {
-      border-radius: 0 2em 2em 0;
+      border-radius: 4px;
     }
 
     &.start-date.end-date {
@@ -327,7 +374,7 @@ $input-height: 3rem !default;
       transition: background 300ms ease-out;
       background: rgba(0, 0, 0, 0.1);
       &, &:hover {
-        background-color: $md-drppicker-active-bg-color;
+        background-color: #4131a1;
         border-color: $md-drppicker-active-border-color;
         color: $md-drppicker-active-color;
       }
@@ -337,6 +384,7 @@ $input-height: 3rem !default;
   th {
     &.month {
       width: auto;
+      color: #153a4b;
     }
   }
 
@@ -462,16 +510,18 @@ $input-height: 3rem !default;
       width: 100%;
       li {
         font-size: 12px;
+        cursor: pointer;
         button {
-          padding: 8px 12px;
+          padding: 10px 12px;
           width: 100%;
           background: none;
           border: none;
           text-align: left;
           cursor: pointer;
+          padding-right: 100px;
           &.active {
-            background-color: #3f51b5;
-            color: #fff;
+            background-color: transparent;
+            color: #4335a0;
           }
           &[disabled] {
             opacity: 0.3;
@@ -510,14 +560,16 @@ $input-height: 3rem !default;
     padding: 0px 6px;
     cursor: pointer;
     border-radius: 2px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
-    background-color: #3f51b5;
-    color: #ecf0f1;
+    box-shadow: none;
+    background-color: #4131a1;
+    color: #fff;
     transition: background-color .4s;
     height: auto;
-    text-transform: uppercase;
+    text-transform: unset;
     line-height: 36px;
     border: none;
+    padding-left: 15px;
+    padding-right: 15px;
     &:hover, &:focus {
       background-color: #3f51b5;
     }
@@ -556,8 +608,10 @@ $input-height: 3rem !default;
       opacity:0.5;
     }
     &.btn-default {
-      color: black;
-      background-color: gainsboro;
+      color: #59727f;
+      background-color: transparent;
+      border: 1px solid #f1f1f1;
+      border-radius: 2px;
     }
   }
   .clear {

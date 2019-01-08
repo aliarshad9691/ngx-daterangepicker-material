@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "name": "ngx-daterangepicker-material"
+    "name": "ngx-material-daterangepicker"
   },
   "apps": [
     {
@@ -36,11 +36,11 @@
   },
   "lint": [
     {
-      "project": "src/tsconfig.app.json",
+      "project": "tsconfig.app.json",
       "exclude": "**/node_modules/**"
     },
     {
-      "project": "src/tsconfig.spec.json",
+      "project": "demo/src/tsconfig.spec.json",
       "exclude": "**/node_modules/**"
     },
     {

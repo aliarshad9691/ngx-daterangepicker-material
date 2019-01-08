@@ -14,13 +14,13 @@ import {
   MatSelectModule
 } from '@angular/material';
 
-import { NgxDaterangepickerMd } from './../../../src/daterangepicker';
 import { AppComponent } from './app.component';
 import { SimpleComponent } from './simple/simple.component';
 import { FullComponent } from './full/full.component';
 import { SingleDatepickerComponent } from './single-datepicker/single-datepicker.component';
 import { CustomRangesComponent } from './custom-ranges/custom-ranges.component';
 import { TimepickerComponent } from './timepicker/timepicker.component';
+import { NgxMdDaterangepicker } from '../../../src/daterangepicker';
 
 
 @NgModule({
@@ -43,7 +43,7 @@ import { TimepickerComponent } from './timepicker/timepicker.component';
     MatGridListModule,
     MatInputModule,
     MatSelectModule,
-    NgxDaterangepickerMd,
+    NgxMdDaterangepicker,
     RouterModule.forRoot(AppRoutes),
   ],
   providers: [],

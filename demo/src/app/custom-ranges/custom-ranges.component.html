@@ -3,12 +3,12 @@
 <div class="row">
   <div class="col s6">
     <input type="text"
-    ngxDaterangepickerMd
+    ngxMdDaterangepicker
     [(ngModel)]="selected"
-    [showCustomRangeLabel]="true"
+    [showCustomRangeLabel]="false"
     [alwaysShowCalendars]="alwaysShowCalendars"
     [ranges]="ranges"
-    [showClearButton]="true"
+    [showClearButton]="false"
     [showCancel]="true"
     [maxDate]="maxDate"
     [minDate]="minDate"
@@ -47,7 +47,7 @@
   <div class="col s6">
     <b>Html code</b>
       <pre class="prettyprint"><code class="html">&lt;input type="text"
-  ngxDaterangepickerMd
+  ngxMdDaterangepicker
   [(ngModel)]="selected"
   [showCustomRangeLabel]="true"
   [alwaysShowCalendars]="{{alwaysShowCalendars}}"

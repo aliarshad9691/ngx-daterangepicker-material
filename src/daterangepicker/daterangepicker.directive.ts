@@ -23,7 +23,7 @@ import * as _moment from 'moment';
 const moment = _moment;
 
 @Directive({
-  selector: 'input[ngxDaterangepickerMd]',
+  selector: 'input[ngxMdDaterangepicker]',
   host: {
     '(keyup.esc)': 'hide()',
     '(blur)': 'onBlur()',

@@ -1,10 +1,12 @@
 import {
     Component, OnInit, ElementRef, ViewChild, EventEmitter, Output, Input, forwardRef, ViewEncapsulation, ChangeDetectorRef
 } from '@angular/core';
-import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
-import { FormControl} from '@angular/forms';
+import {NG_VALUE_ACCESSOR, ControlValueAccessor} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 
-import * as _moment from 'moment'; const moment = _moment;
+import * as _moment from 'moment';
+
+const moment = _moment;
 
 export enum SideEnum {
     left = 'left',
@@ -12,11 +14,11 @@ export enum SideEnum {
 }
 
 @Component({
-    selector: 'ngx-daterangepicker-material',
+    selector: 'ngx-material-daterangepicker',
     styleUrls: ['./daterangepicker.component.scss'],
     templateUrl: './daterangepicker.component.html',
     host: {
-    '(click)': 'handleInternalClick($event)',
+        '(click)': 'handleInternalClick($event)',
     },
     encapsulation: ViewEncapsulation.None,
     providers: [{
@@ -26,18 +28,17 @@ export enum SideEnum {
     }]
 })
 export class DaterangepickerComponent implements OnInit {
-    private _old: {start: any, end: any} = {start: null, end: null};
     chosenLabel: string;
-    calendarVariables: {left: any, right: any} = {left: {}, right: {}};
-    timepickerVariables: {left: any, right: any} = {left: {}, right: {}};
-    daterangepicker: {start: FormControl, end: FormControl} = {start: new FormControl(), end: new FormControl()};
-    applyBtn: {disabled: boolean} = {disabled: false};
+    calendarVariables: { left: any, right: any } = {left: {}, right: {}};
+    timepickerVariables: { left: any, right: any } = {left: {}, right: {}};
+    daterangepicker: { start: FormControl, end: FormControl } = {start: new FormControl(), end: new FormControl()};
+    applyBtn: { disabled: boolean } = {disabled: false};
     startDate = moment().startOf('day');
     endDate = moment().endOf('day');
     dateLimit = null;
+    days = 0;
     // used in template for compile time support of enum values.
     sideEnum = SideEnum;
-
     @Input()
     minDate: _moment.Moment = null;
     @Input()
@@ -51,7 +52,7 @@ export class DaterangepickerComponent implements OnInit {
     @Input()
     showWeekNumbers: Boolean = false;
     @Input()
-    showISOWeekNumbers : Boolean= false;
+    showISOWeekNumbers: Boolean = false;
     @Input()
     linkedCalendars: Boolean = false;
     @Input()
@@ -90,8 +91,8 @@ export class DaterangepickerComponent implements OnInit {
         applyLabel: 'Apply',
         cancelLabel: 'Cancel',
         customRangeLabel: 'Custom range',
-        daysOfWeek: moment.weekdaysMin(),
-        monthNames: moment.monthsShort(),
+        daysOfWeek: moment.weekdaysShort(),
+        monthNames: moment.months(),
         firstDay: moment.localeData().firstDayOfWeek()
     };
     // custom ranges
@@ -106,27 +107,28 @@ export class DaterangepickerComponent implements OnInit {
     @Input()
     showRangeLabelOnInput: boolean = false;
     chosenRange: string;
+    chosenRangeGroup: string;
     rangesArray: Array<any> = [];
-
+    rangesArray2: any = {};
+    rangesGroupArray: Array<any> = [];
+    ranges2: any = {};
     // some state information
     isShown: Boolean = false;
     inline: boolean = true;
     leftCalendar: any = {};
     rightCalendar: any = {};
     showCalInRanges: Boolean = false;
-
-    options: any = {} ; // should get some opt from user
+    options: any = {}; // should get some opt from user
     @Input() drops: string;
     @Input() opens: string;
     @Output('choosedDate') choosedDate: EventEmitter<Object>;
     @Output('rangeClicked') rangeClicked: EventEmitter<Object>;
     @Output('datesUpdated') datesUpdated: EventEmitter<Object>;
     @ViewChild('pickerContainer') pickerContainer: ElementRef;
+    private _old: { start: any, end: any } = {start: null, end: null};
 
-    constructor(
-        private el: ElementRef,
-        private _ref: ChangeDetectorRef
-    ) {
+    constructor(private el: ElementRef,
+                private _ref: ChangeDetectorRef) {
         this.choosedDate = new EventEmitter();
         this.rangeClicked = new EventEmitter();
         this.datesUpdated = new EventEmitter();
@@ -145,10 +147,10 @@ export class DaterangepickerComponent implements OnInit {
             this._old.start = this.startDate.clone();
             this._old.end = this.endDate.clone();
         }
-        if (!this.locale.format) { 
+        if (!this.locale.format) {
             if (this.timePicker) {
                 this.locale.format = moment.localeData().longDateFormat('lll');
-            } else { 
+            } else {
                 this.locale.format = moment.localeData().longDateFormat('L');
             }
         }
@@ -156,57 +158,73 @@ export class DaterangepickerComponent implements OnInit {
         this.renderCalendar(SideEnum.right);
         this.renderRanges();
     }
+
     renderRanges() {
         let start, end;
         if (typeof this.ranges === 'object') {
-            for (const range in this.ranges) {
-                if (typeof this.ranges[range][0] === 'string') {
-                    start = moment(this.ranges[range][0], this.locale.format);
-                } else {
-                    start = moment(this.ranges[range][0]);
-                }
+            for (let rangeGroup in this.ranges) {
+                for (let range in this.ranges[rangeGroup]) {
+                    if (typeof this.ranges[rangeGroup][range][0] === 'string') {
+                        start = moment(this.ranges[rangeGroup][range][0], this.locale.format);
+                    } else {
+                        start = moment(this.ranges[rangeGroup][range][0]);
+                    }
 
-                if (typeof this.ranges[range][1] === 'string') {
-                    end = moment(this.ranges[range][1], this.locale.format);
-                } else {
-                    end = moment(this.ranges[range][1]);
-                }
+                    if (typeof this.ranges[rangeGroup][range][1] === 'string') {
+                        end = moment(this.ranges[rangeGroup][range][1], this.locale.format);
+                    } else {
+                        end = moment(this.ranges[rangeGroup][range][1]);
+                    }
 
-                // If the start or end date exceed those allowed by the minDate or maxSpan
-                // options, shorten the range to the allowable period.
-                if (this.minDate && start.isBefore(this.minDate)) {
-                    start = this.minDate.clone();
-                }
+                    // If the start or end date exceed those allowed by the minDate or maxSpan
+                    // options, shorten the range to the allowable period.
+                    if (this.minDate && start.isBefore(this.minDate)) {
+                        start = this.minDate.clone();
+                    }
 
-                var maxDate = this.maxDate;
-                if (this.maxSpan && maxDate && start.clone().add(this.maxSpan).isAfter(maxDate)) {
-                    maxDate = start.clone().add(this.maxSpan);
-                }
-                if (maxDate && end.isAfter(maxDate)) {
-                    end = maxDate.clone();
-                }
+                    var maxDate = this.maxDate;
+                    if (this.maxSpan && maxDate && start.clone().add(this.maxSpan).isAfter(maxDate)) {
+                        maxDate = start.clone().add(this.maxSpan);
+                    }
+                    if (maxDate && end.isAfter(maxDate)) {
+                        end = maxDate.clone();
+                    }
 
-                // If the end of the range is before the minimum or the start of the range is
-                // after the maximum, don't display this range option at all.
-                if ((this.minDate && end.isBefore(this.minDate, this.timePicker ? 'minute' : 'day'))
-                || (maxDate && start.isAfter(maxDate, this.timePicker ? 'minute' : 'day'))) {
-                    continue;
+                    // If the end of the range is before the minimum or the start of the range is
+                    // after the maximum, don't display this range option at all.
+                    if ((this.minDate && end.isBefore(this.minDate, this.timePicker ? 'minute' : 'day'))
+                        || (maxDate && start.isAfter(maxDate, this.timePicker ? 'minute' : 'day'))) {
+                        continue;
+                    }
+
+                    //Support unicode chars in the range names.
+                    var elem = document.createElement('textarea');
+                    elem.innerHTML = range;
+                    var rangeHtml = elem.value;
+
+                    elem.innerHTML = rangeGroup;
+                    var rangeGroupHtml = elem.value;
+
+                    if (!this.ranges2[rangeGroupHtml]) {
+                        this.ranges2[rangeGroupHtml] = {};
+                    }
+                    this.ranges2[rangeGroupHtml][rangeHtml] = [start, end];
                 }
-
-                //Support unicode chars in the range names.
-                var elem = document.createElement('textarea');
-                elem.innerHTML = range;
-                var rangeHtml = elem.value;
-
-                this.ranges[rangeHtml] = [start, end];
             }
-            for (const range in this.ranges) {
-                this.rangesArray.push(range);
+            for (let rangeGroup in this.ranges2) {
+                this.rangesGroupArray.push(rangeGroup);
+                for (let range in this.ranges2[rangeGroup]) {
+                    if (!this.rangesArray2[rangeGroup]) {
+                        this.rangesArray2[rangeGroup] = [];
+                    }
+                    this.rangesArray2[rangeGroup].push(range);
+                }
+                if (this.showCustomRangeLabel) {
+                    this.rangesArray2[rangeGroup].push(this.locale.customRangeLabel);
+                }
             }
-            if (this.showCustomRangeLabel) {
-                this.rangesArray.push(this.locale.customRangeLabel);
-            }
-            this.showCalInRanges = (!this.rangesArray.length) || this.alwaysShowCalendars;
+
+            this.showCalInRanges = (!this.rangesGroupArray.length) || this.alwaysShowCalendars;
             if (!this.timePicker) {
                 this.startDate = this.startDate.startOf('day');
                 this.endDate = this.endDate.endOf('day');
@@ -218,18 +236,19 @@ export class DaterangepickerComponent implements OnInit {
         }
 
     }
+
     renderTimePicker(side: SideEnum) {
         if (side == SideEnum.right && !this.endDate) {
             return;
         }
         let selected, minDate;
-        let maxDate = this.maxDate
+        let maxDate = this.maxDate;
         if (side === SideEnum.left) {
             selected = this.startDate.clone(),
-            minDate = this.minDate
+                minDate = this.minDate;
         } else if (side === SideEnum.right) {
             selected = this.endDate.clone(),
-            minDate = this.startDate
+                minDate = this.startDate;
         }
         const start = this.timePicker24Hour ? 0 : 1;
         const end = this.timePicker24Hour ? 23 : 12;
@@ -333,8 +352,9 @@ export class DaterangepickerComponent implements OnInit {
         }
         this.timepickerVariables[side].selected = selected;
     }
+
     renderCalendar(side: SideEnum) { // side enum
-        let mainCalendar: any = ( side === SideEnum.left ) ? this.leftCalendar : this.rightCalendar;
+        let mainCalendar: any = (side === SideEnum.left) ? this.leftCalendar : this.rightCalendar;
         const month = mainCalendar.month.month();
         const year = mainCalendar.month.year();
         const hour = mainCalendar.month.hour();
@@ -348,7 +368,7 @@ export class DaterangepickerComponent implements OnInit {
         const daysInLastMonth = moment([lastYear, lastMonth]).daysInMonth();
         const dayOfWeek = firstDay.day();
         // initialize a 6 rows x 7 columns array for the calendar
-        let calendar: any= [];
+        let calendar: any = [];
         calendar.firstDay = firstDay;
         calendar.lastDay = lastDay;
 
@@ -376,12 +396,12 @@ export class DaterangepickerComponent implements OnInit {
             curDate.hour(12);
 
             if (this.minDate && calendar[row][col].format('YYYY-MM-DD') === this.minDate.format('YYYY-MM-DD') &&
-            calendar[row][col].isBefore(this.minDate) && side === 'left') {
+                calendar[row][col].isBefore(this.minDate) && side === 'left') {
                 calendar[row][col] = this.minDate.clone();
             }
 
             if (this.maxDate && calendar[row][col].format('YYYY-MM-DD') === this.maxDate.format('YYYY-MM-DD') &&
-            calendar[row][col].isAfter(this.maxDate) && side === 'right') {
+                calendar[row][col].isAfter(this.maxDate) && side === 'right') {
                 calendar[row][col] = this.maxDate.clone();
             }
         }
@@ -456,7 +476,7 @@ export class DaterangepickerComponent implements OnInit {
         for (let row = 0; row < 6; row++) {
             this.calendarVariables[side].classes[row] = {};
             const rowClasses = [];
-            if(this.emptyWeekRowClass && !this.hasCurrentMonthDays(month, calendar[row])) {
+            if (this.emptyWeekRowClass && !this.hasCurrentMonthDays(month, calendar[row])) {
                 rowClasses.push(this.emptyWeekRowClass);
             }
             for (let col = 0; col < 7; col++) {
@@ -477,12 +497,12 @@ export class DaterangepickerComponent implements OnInit {
                     classes.push('off');
 
                     // mark the last day of the previous month in this calendar
-                    if(this.lastDayOfPreviousMonthClass && (calendar[row][col].month() < calendar[1][1].month() || calendar[1][1].month() === 0) && calendar[row][col].date() === daysInLastMonth) {
+                    if (this.lastDayOfPreviousMonthClass && (calendar[row][col].month() < calendar[1][1].month() || calendar[1][1].month() === 0) && calendar[row][col].date() === daysInLastMonth) {
                         classes.push(this.lastDayOfPreviousMonthClass);
                     }
 
                     // mark the first day of the next month in this calendar
-                    if(this.firstDayOfNextMonthClass && (calendar[row][col].month() > calendar[1][1].month() || calendar[row][col].month() === 0) && calendar[row][col].date() === 1) {
+                    if (this.firstDayOfNextMonthClass && (calendar[row][col].month() > calendar[1][1].month() || calendar[row][col].month() === 0) && calendar[row][col].date() === 1) {
                         classes.push(this.firstDayOfNextMonthClass);
                     }
                 }
@@ -554,6 +574,7 @@ export class DaterangepickerComponent implements OnInit {
             this.calendarVariables[side].classes[row].classList = rowClasses.join(' ');
         }
     }
+
     setStartDate(startDate) {
         if (typeof startDate === 'string') {
             this.startDate = moment(startDate, this.locale.format);
@@ -602,7 +623,7 @@ export class DaterangepickerComponent implements OnInit {
             this.endDate = moment(endDate);
         }
         if (!this.timePicker) {
-            this.endDate = this.endDate.add(1,'d').startOf('day').subtract(1,'second');
+            this.endDate = this.endDate.add(1, 'd').startOf('day').subtract(1, 'second');
         }
 
         if (this.timePicker && this.timePickerIncrement) {
@@ -631,6 +652,7 @@ export class DaterangepickerComponent implements OnInit {
             this.datesUpdated.emit({startDate: this.startDate, endDate: this.endDate});
         }
     }
+
     @Input()
     isInvalidDate(date) {
         return false;
@@ -654,26 +676,26 @@ export class DaterangepickerComponent implements OnInit {
             // if both dates are visible already, do nothing
             if (!this.singleDatePicker && this.leftCalendar.month && this.rightCalendar.month &&
                 ((this.startDate && this.leftCalendar && this.startDate.format('YYYY-MM') === this.leftCalendar.month.format('YYYY-MM')) ||
-                (this.startDate && this.rightCalendar && this.startDate.format('YYYY-MM') === this.rightCalendar.month.format('YYYY-MM')))
+                    (this.startDate && this.rightCalendar && this.startDate.format('YYYY-MM') === this.rightCalendar.month.format('YYYY-MM')))
                 &&
                 (this.endDate.format('YYYY-MM') === this.leftCalendar.month.format('YYYY-MM') ||
-                this.endDate.format('YYYY-MM') === this.rightCalendar.month.format('YYYY-MM'))
-                ) {
+                    this.endDate.format('YYYY-MM') === this.rightCalendar.month.format('YYYY-MM'))
+            ) {
                 return;
             }
             if (this.startDate) {
                 this.leftCalendar.month = this.startDate.clone().date(2);
                 if (!this.linkedCalendars && (this.endDate.month() !== this.startDate.month() ||
-                    this.endDate.year() !== this.startDate.year())) {
+                        this.endDate.year() !== this.startDate.year())) {
                     this.rightCalendar.month = this.endDate.clone().date(2);
                 } else {
-                        this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
+                    this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
                 }
             }
 
         } else {
             if (this.leftCalendar.month.format('YYYY-MM') !== this.startDate.format('YYYY-MM') &&
-            this.rightCalendar.month.format('YYYY-MM') !== this.startDate.format('YYYY-MM')) {
+                this.rightCalendar.month.format('YYYY-MM') !== this.startDate.format('YYYY-MM')) {
                 this.leftCalendar.month = this.startDate.clone().date(2);
                 this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
             }
@@ -683,6 +705,7 @@ export class DaterangepickerComponent implements OnInit {
             this.leftCalendar.month = this.maxDate.clone().date(2).subtract(1, 'month');
         }
     }
+
     /**
      *  This is responsible for updating the calendars
      */
@@ -690,22 +713,27 @@ export class DaterangepickerComponent implements OnInit {
         this.renderCalendar(SideEnum.left);
         this.renderCalendar(SideEnum.right);
 
-        if (this.endDate === null) { return; }
+        if (this.endDate === null) {
+            return;
+        }
         this.calculateChosenLabel();
     }
+
     updateElement() {
         if (!this.singleDatePicker && this.autoUpdateInput) {
             if (this.startDate && this.endDate) {
                 // if we use ranges and should show range label on inpu
-                if (this.rangesArray.length && this.showRangeLabelOnInput === true && this.chosenRange &&
-                    this.locale.customRangeLabel !== this.chosenRange) {
-                    this.chosenLabel = this.chosenRange;
-                } else {
-                    this.chosenLabel = this.startDate.format(this.locale.format) +
+                // if (this.rangesGroupArray.length && this.showRangeLabelOnInput === true && this.chosenRange &&
+                //     this.locale.customRangeLabel !== this.chosenRange) {
+                //     this.chosenLabel = this.chosenRange;
+                // } else {
+                //     this.chosenLabel = this.startDate.format(this.locale.format) +
+                //         this.locale.separator + this.endDate.format(this.locale.format);
+                // }
+                this.chosenLabel = this.startDate.format(this.locale.format) +
                     this.locale.separator + this.endDate.format(this.locale.format);
-                }
             }
-        } else if ( this.autoUpdateInput) {
+        } else if (this.autoUpdateInput) {
             this.chosenLabel = this.startDate.format(this.locale.format);
         }
     }
@@ -713,32 +741,48 @@ export class DaterangepickerComponent implements OnInit {
     remove() {
         this.isShown = false;
     }
+
     /**
      * this should calculate the label
      */
-    calculateChosenLabel () {
+    calculateChosenLabel(specificGroup?: string) {
         let customRange = true;
         let i = 0;
-        if (this.rangesArray.length > 0) {
-            for (const range in this.ranges) {
-                if (this.timePicker) {
-                    var format = this.timePickerSeconds ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD HH:mm";
-                    //ignore times when comparing dates if time picker seconds is not enabled
-                    if (this.startDate.format(format) == this.ranges[range][0].format(format) && this.endDate.format(format) == this.ranges[range][1].format(format)) {
-                        customRange = false;
-                        this.chosenRange = this.rangesArray[i];
-                        break;
+        let j = 0;
+        if (this.rangesGroupArray.length > 0) {
+            for (const rangesGroup in this.ranges2) {
+                i = 0;
+                for (const range in this.ranges2[rangesGroup]) {
+                    if (this.timePicker) {
+                        var format = this.timePickerSeconds ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD HH:mm';
+                        //ignore times when comparing dates if time picker seconds is not enabled
+                        if (this.startDate.format(format) == this.ranges2[rangesGroup][range][0].format(format) && this.endDate.format(format) == this.ranges2[rangesGroup][range][1].format(format)) {
+                            customRange = false;
+                            if (specificGroup && rangesGroup === specificGroup) {
+                                this.chosenRange = this.rangesArray2[rangesGroup][i];
+                            } else if (!specificGroup) {
+                                this.chosenRangeGroup = rangesGroup;
+                                this.chosenRange = this.rangesArray2[rangesGroup][i];
+                            }
+                            break;
+                        }
+                    } else {
+                        //ignore times when comparing dates if time picker is not enabled
+                        if (this.startDate.format('YYYY-MM-DD') == this.ranges2[rangesGroup][range][0].format('YYYY-MM-DD') && this.endDate.format('YYYY-MM-DD') == this.ranges2[rangesGroup][range][1].format('YYYY-MM-DD')) {
+                            customRange = false;
+                            if (specificGroup && rangesGroup === specificGroup) {
+                                this.chosenRange = this.rangesArray2[rangesGroup][i];
+                            } else if (!specificGroup) {
+                                this.chosenRangeGroup = rangesGroup;
+                                this.chosenRange = this.rangesArray2[rangesGroup][i];
+                            }
+                            break;
+                        }
                     }
-                } else {
-                    //ignore times when comparing dates if time picker is not enabled
-                    if (this.startDate.format('YYYY-MM-DD') == this.ranges[range][0].format('YYYY-MM-DD') && this.endDate.format('YYYY-MM-DD') == this.ranges[range][1].format('YYYY-MM-DD')) {
-                        customRange = false;
-                        this.chosenRange = this.rangesArray[i];
-                        break;
-                    }
-                }
 
-                i++;
+                    i++;
+                }
+                j++;
             }
             if (customRange) {
                 if (this.showCustomRangeLabel) {
@@ -751,7 +795,12 @@ export class DaterangepickerComponent implements OnInit {
             }
         }
 
+        if (customRange) {
+            this.chosenRangeGroup = this.rangesGroupArray[1];
+        }
+
         this.updateElement();
+        this.days = this.endDate.diff(this.startDate, 'days') + 1;
     }
 
     clickApply(e?) {
@@ -762,7 +811,7 @@ export class DaterangepickerComponent implements OnInit {
         if (this.isInvalidDate && this.startDate && this.endDate) {
             // get if there are invalid date between range
             let d = this.startDate.clone();
-            while(d.isBefore(this.endDate)) {
+            while (d.isBefore(this.endDate)) {
                 if (this.isInvalidDate(d)) {
                     this.endDate = d.subtract(1, 'days');
                     this.calculateChosenLabel();
@@ -782,11 +831,12 @@ export class DaterangepickerComponent implements OnInit {
     clickCancel(e) {
         this.startDate = this._old.start;
         this.endDate = this._old.end;
-        if(this.inline) {
+        if (this.inline) {
             this.updateView();
         }
         this.hide();
     }
+
     /**
      * called when month is changed
      * @param monthEvent get value in event.target.value
@@ -797,6 +847,7 @@ export class DaterangepickerComponent implements OnInit {
         const month = parseInt(monthEvent.target.value, 10);
         this.monthOrYearChanged(month, year, side);
     }
+
     /**
      * called when year is changed
      * @param yearEvent get value in event.target.value
@@ -807,6 +858,7 @@ export class DaterangepickerComponent implements OnInit {
         const year = parseInt(yearEvent.target.value, 10);
         this.monthOrYearChanged(month, year, side);
     }
+
     /**
      * called when time is changed
      * @param timeEvent  an event
@@ -852,6 +904,7 @@ export class DaterangepickerComponent implements OnInit {
         this.renderTimePicker(SideEnum.left);
         this.renderTimePicker(SideEnum.right);
     }
+
     /**
      *  call when month or year changed
      * @param month month number 0 -11
@@ -912,6 +965,7 @@ export class DaterangepickerComponent implements OnInit {
         }
         this.updateCalendars();
     }
+
     /**
      * Click on next month
      * @param side left or right calendar
@@ -927,6 +981,7 @@ export class DaterangepickerComponent implements OnInit {
         }
         this.updateCalendars();
     }
+
     /**
      * When selecting a date
      * @param e event: get value by e.target.value
@@ -944,11 +999,11 @@ export class DaterangepickerComponent implements OnInit {
                 return;
             }
         }
-        if (this.rangesArray.length) {
+        if (this.rangesGroupArray.length) {
             this.chosenRange = this.locale.customRangeLabel;
         }
 
-        let date = side ===  SideEnum.left ? this.leftCalendar.calendar[row][col] : this.rightCalendar.calendar[row][col];
+        let date = side === SideEnum.left ? this.leftCalendar.calendar[row][col] : this.rightCalendar.calendar[row][col];
 
         if (this.endDate || date.isBefore(this.startDate, 'day')) { // picking start
             if (this.timePicker) {
@@ -1005,6 +1060,13 @@ export class DaterangepickerComponent implements OnInit {
         e.stopPropagation();
 
     }
+
+    clickRangeGroup(e, label) {
+        this.chosenRangeGroup = label;
+        this.chosenRange = '';
+        this.calculateChosenLabel(label);
+    }
+
     /**
      *  Click on the custom range
      * @param e: Event
@@ -1013,10 +1075,10 @@ export class DaterangepickerComponent implements OnInit {
     clickRange(e, label) {
         this.chosenRange = label;
         if (label == this.locale.customRangeLabel) {
-            this.isShown  = true; // show calendars
+            this.isShown = true; // show calendars
             this.showCalInRanges = true;
         } else {
-            var dates = this.ranges[label];
+            var dates = this.ranges2[this.chosenRangeGroup][label];
             this.startDate = dates[0].clone();
             this.endDate = dates[1].clone();
             if (this.showRangeLabelOnInput && label !== this.locale.customRangeLabel) {
@@ -1024,7 +1086,7 @@ export class DaterangepickerComponent implements OnInit {
             } else {
                 this.calculateChosenLabel();
             }
-            this.showCalInRanges = (!this.rangesArray.length) || this.alwaysShowCalendars;
+            this.showCalInRanges = (!this.rangesGroupArray.length) || this.alwaysShowCalendars;
 
             if (!this.timePicker) {
                 this.startDate.startOf('day');
@@ -1032,7 +1094,7 @@ export class DaterangepickerComponent implements OnInit {
             }
 
             if (!this.alwaysShowCalendars) {
-                this.isShown  = false; // hide calendars
+                this.isShown = false; // hide calendars
             }
             this.rangeClicked.emit({label: label, dates: dates});
             if (!this.keepCalendarOpeningWithRange) {
@@ -1043,12 +1105,14 @@ export class DaterangepickerComponent implements OnInit {
             }
 
         }
+        this.days = this.endDate.diff(this.startDate, 'days') + 1;
     };
 
 
-
     show(e?) {
-        if (this.isShown) { return; }
+        if (this.isShown) {
+            return;
+        }
         this._old.start = this.startDate.clone();
         this._old.end = this.endDate.clone();
         this.isShown = true;
@@ -1071,14 +1135,14 @@ export class DaterangepickerComponent implements OnInit {
 
         // if a new date range was selected, invoke the user callback function
         if (!this.startDate.isSame(this._old.start) || !this.endDate.isSame(this._old.end)) {
-           // this.callback(this.startDate, this.endDate, this.chosenLabel);
+            // this.callback(this.startDate, this.endDate, this.chosenLabel);
         }
 
         // if picker is attached to a text input, update it
         this.updateElement();
         this.isShown = false;
         this._ref.detectChanges();
-        
+
     }
 
     /**
@@ -1086,19 +1150,21 @@ export class DaterangepickerComponent implements OnInit {
      * @param e event
      */
     handleInternalClick(e) {
-        e.stopPropagation()
+        e.stopPropagation();
     }
+
     /**
      * update the locale options
      * @param locale
      */
     updateLocale(locale) {
         for (const key in locale) {
-          if (locale.hasOwnProperty(key)) {
-            this.locale[key] = locale[key];
-          }
+            if (locale.hasOwnProperty(key)) {
+                this.locale[key] = locale[key];
+            }
         }
     }
+
     /**
      *  clear the daterange picker
      */
@@ -1114,25 +1180,25 @@ export class DaterangepickerComponent implements OnInit {
      * Find out if the selected range should be disabled if it doesn't
      * fit into minDate and maxDate limitations.
      */
-    disableRange(range) {
-      if (range === this.locale.customRangeLabel) {
-        return false;
-      }
-      const rangeMarkers = this.ranges[range];
-      const areBothBefore = rangeMarkers.every( date => {
-        if (!this.minDate) {
+    disableRange(rangesGroup, range) {
+        if (range === this.locale.customRangeLabel) {
             return false;
         }
-        return date.isBefore(this.minDate)
-      });
+        const rangeMarkers = this.ranges2[rangesGroup][range];
+        const areBothBefore = rangeMarkers.every(date => {
+            if (!this.minDate) {
+                return false;
+            }
+            return date.isBefore(this.minDate);
+        });
 
-      const areBothAfter = rangeMarkers.every( date => {
-        if (!this.maxDate) {
-            return false;
-        }
-        return date.isAfter(this.maxDate)
-      });
-      return (areBothBefore || areBothAfter);
+        const areBothAfter = rangeMarkers.every(date => {
+            if (!this.maxDate) {
+                return false;
+            }
+            return date.isAfter(this.maxDate);
+        });
+        return (areBothBefore || areBothAfter);
     }
 
     /**
@@ -1141,7 +1207,7 @@ export class DaterangepickerComponent implements OnInit {
      */
     hasCurrentMonthDays(currentMonth, row) {
         for (let day = 0; day < 7; day++) {
-            if(row[day].month() === currentMonth) {
+            if (row[day].month() === currentMonth) {
                 return true;
             }
         }
